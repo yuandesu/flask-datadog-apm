@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - DD_SERVICE=flask-docker-demo
+      - DD_ENV=dev
+      - DD_TRACE_ENABLED=true
+      - DD_AGENT_HOST=datadog
+      - DD_VERSION=1.0
+    depends_on:
+      - datadog
+
+  datadog:
+    image: datadog/agent:7
+    environment:
+      - DD_API_KEY=45b7daccd7e5ba12b1dbdfb8d082aea9
+      - DD_APM_ENABLED=true
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_SITE=datadoghq.com
+    ports:
+      - "8126:8126"  # APM port
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
